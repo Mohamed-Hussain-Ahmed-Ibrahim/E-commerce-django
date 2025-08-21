@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Checkout</h1>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Shipping Information</h5>
+                    <form method="post" id="payment-form">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.first_name|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.last_name|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.phone|as_crispy_field }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.address|as_crispy_field }}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.city|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                {{ form.state|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                {{ form.zip_code|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5 class="mb-3">Payment Information</h5>
+                            <div id="card-element" class="form-control mb-3">
+                                <!-- Stripe Card Element will be inserted here -->
+                            </div>
+                            <div id="card-errors" class="invalid-feedback d-block" role="alert"></div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100" id="submit-button">
+                            <span id="button-text">Pay Now</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Order Summary</h5>
+                    {% for item in cart_items %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <h6 class="mb-0">{{ item.product.name }}</h6>
+                                <small class="text-muted">Quantity: {{ item.quantity }}</small>
+                            </div>
+                            <span>${{ item.total_price }}</span>
+                        </div>
+                    {% endfor %}
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span>${{ subtotal }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping</span>
+                        <span>${{ shipping }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax (10%)</span>
+                        <span>${{ tax }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total</strong>
+                        <strong class="text-danger">${{ total }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    // Initialize Stripe
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const elements = stripe.elements();
+    
+    // Create card Element and mount it
+    const card = elements.create('card', {
+        style: {
+            base: {
+                fontSize: '16px',
+                color: '#424770',
+                '::placeholder': {
+                    color: '#aab7c4'
+                }
+            },
+            invalid: {
+                color: '#9e2146'
+            }
+        }
+    });
+    card.mount('#card-element');
+    
+    // Handle form submission
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+    const buttonText = document.getElementById('button-text');
+    
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        submitButton.disabled = true;
+        buttonText.textContent = 'Processing...';
+        
+        const {error, paymentMethod} = await stripe.createPaymentMethod({
+            type: 'card',
+            card: card,
+        });
+        
+        if (error) {
+            const errorElement = document.getElementById('card-errors');
+            errorElement.textContent = error.message;
+            submitButton.disabled = false;
+            buttonText.textContent = 'Pay Now';
+        } else {
+            // Add payment method ID to form
+            const hiddenInput = document.createElement('input');
+            hiddenInput.setAttribute('type', 'hidden');
+            hiddenInput.setAttribute('name', 'payment_method_id');
+            hiddenInput.setAttribute('value', paymentMethod.id);
+            form.appendChild(hiddenInput);
+            
+            // Submit the form
+            form.submit();
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

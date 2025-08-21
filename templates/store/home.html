@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to E-Commerce Store{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero bg-light py-5 text-center">
+    <div class="container">
+        <h1 class="display-4">Welcome to Our Store</h1>
+        <p class="lead">Discover amazing products at great prices</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">Shop Now</a>
+    </div>
+</section>
+
+<!-- Featured Categories -->
+<section class="featured-categories my-5">
+    <h2 class="text-center mb-4">Shop by Category</h2>
+    <div class="row">
+        {% for category in categories %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if category.image %}
+                    <img src="{{ category.image.url }}" class="card-img-top" alt="{{ category.name }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="{{ category.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ category.name }}</h5>
+                    <p class="card-text">{{ category.description|truncatewords:20 }}</p>
+                    <a href="{% url 'store:category_products' category.slug %}" class="btn btn-outline-primary">View Products</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="featured-products my-5">
+    <h2 class="text-center mb-4">Featured Products</h2>
+    <div class="row">
+        {% for product in featured_products %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.description|truncatewords:15 }}</p>
+                    <p class="card-text"><strong>${{ product.price }}</strong></p>
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-primary w-100">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features bg-light py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="feature">
+                    <i class="fas fa-truck fa-3x mb-3 text-primary"></i>
+                    <h3>Free Shipping</h3>
+                    <p>On orders over $50</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature">
+                    <i class="fas fa-undo fa-3x mb-3 text-primary"></i>
+                    <h3>Easy Returns</h3>
+                    <p>30-day return policy</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature">
+                    <i class="fas fa-lock fa-3x mb-3 text-primary"></i>
+                    <h3>Secure Payment</h3>
+                    <p>100% secure checkout</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h3>Subscribe to Our Newsletter</h3>
+                <p>Get updates about new products and special offers!</p>
+                <form class="row g-3 justify-content-center">
+                    <div class="col-auto">
+                        <input type="email" class="form-control" placeholder="Enter your email">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

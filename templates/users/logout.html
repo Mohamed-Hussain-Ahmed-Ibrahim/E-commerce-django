@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Logged Out{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="mb-4">You have been logged out</h2>
+                    <p class="text-muted mb-4">Thank you for visiting our store!</p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'users:login' %}" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Log In Again
+                        </a>
+                        <a href="{% url 'store:home' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-home"></i> Return to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
